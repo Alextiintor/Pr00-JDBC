@@ -165,6 +165,7 @@ public class ProductController {
 		//verificar si les dades són vàlides
 		if(isDataValid()){
 			if(newProduct){
+                System.out.println("Nuevo producto");
                 if(packCheckBox.isSelected()){
                     product = createPack();
                 } else {
@@ -172,17 +173,27 @@ public class ProductController {
                 }				
 
 				productsData.add(product);
+                productsDAO.saveInDB(product);
 			}else{
+                System.out.println("Update producto");
 				//modificació registre existent
-				product = productsTable.getSelectionModel().getSelectedItem();
+                if(packCheckBox.isSelected()){
+                    Pack p = createPack();
+                    productsDAO.saveInDB(p);
+                } else {
+                    product = productsTable.getSelectionModel().getSelectedItem();
 
-                product.setName(nameTextField.getText());
-                product.setPrice(Float.parseFloat(priceTextField.getText()));
-                product.setStock(Integer.parseInt(stockTextField.getText()));
-                product.setCatalogStartDate(startDatePicker.getValue());
-                product.setCatalogFinishDate(endDatePicker.getValue()); 
+                    product.setName(nameTextField.getText());
+                    product.setPrice(Float.parseFloat(priceTextField.getText()));
+                    product.setStock(Integer.parseInt(stockTextField.getText()));
+                    product.setCatalogStartDate(startDatePicker.getValue());
+                    product.setCatalogFinishDate(endDatePicker.getValue());
+
+                    productsDAO.saveInDB(product); 
+                }
+				
 			}
-			productsDAO.saveInDB(product);
+			
 			clearForm();
 
 			productsTable.refresh();
@@ -251,6 +262,7 @@ public class ProductController {
             newProduct = false;
             if(_product instanceof Pack){
                 Pack packTemp = (Pack)_product;
+                idTextField.setText(String.valueOf(packTemp.getId()));
                 nameTextField.setText(packTemp.getName());
                 priceTextField.setText(String.valueOf(packTemp.getPrice()));
                 stockTextField.setText(String.valueOf(packTemp.getStock()));
@@ -300,5 +312,10 @@ public class ProductController {
 		stockTextField.setText("");
 		startDatePicker.setValue(null);
 		endDatePicker.setValue(null);
+
+        packCheckBox.setSelected(false);
+        packGridPane.setVisible(false);
+        dtoTextField.setText("");
+        listTextArea.setText("");
 	}
 }

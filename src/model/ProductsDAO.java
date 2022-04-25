@@ -153,53 +153,60 @@ public class ProductsDAO {
 
     //Funcion para guardar en la base de datos
     public boolean saveInDB(Object obj){
-        try {
-            String sql = "";
-            PreparedStatement stmt = null;
-            Product productTMP = (Product)obj;
-            if(findInDB(productTMP.getID()) == null){
+        Product productTMP = (Product)obj;
 
-                if(obj instanceof Pack){
-                    Pack p = (Pack)obj;
-                    insertPack(p);
-                }
-                sql = "INSERT INTO producto VALUES(?,?,?,?,?,?)";
-                stmt = conexionBD.prepareStatement(sql);
-                int i = 1;
-                stmt.setInt(i++, product.getID());
-                stmt.setString(i++, product.getName());
-                stmt.setFloat(i++, product.getPrice());
-                stmt.setInt(i++, product.getStock());
-                Date startDate = Date.valueOf(product.getCatalogStartDate());
-                stmt.setDate(i++, startDate);
-                Date endDate = Date.valueOf(product.getCatalogFinishDate());
-                stmt.setDate(i++, endDate);
+        if(findInDB(productTMP.getID()) == null){
+            if(obj instanceof Pack){
+                Pack p = (Pack)obj;
+                return insertPack(p);
             } else {
-                sql = "UPDATE producto set nombre=?, precio=?, stock=?, fecha_inicio=?, fecha_fin=? WHERE id = ?";
-                stmt = conexionBD.prepareStatement(sql);
-                int i = 1;
-                stmt.setString(i++, product.getName());
-                stmt.setFloat(i++, product.getPrice());
-                stmt.setInt(i++, product.getStock());
-                Date startDate = Date.valueOf(product.getCatalogStartDate());
-                stmt.setDate(i++, startDate);
-                Date endDate = Date.valueOf(product.getCatalogFinishDate());
-                stmt.setDate(i++, endDate);
-                stmt.setInt(i++, product.getId());
+                Product p = (Product)obj;
+                return insertProduct(p);
             }
+
+        } else {
+            if(isPack(productTMP.getID())){
+                Pack pack = (Pack)obj;
+                return updatePack(pack);
+            } else {
+                Product p = (Product)obj;
+                return updateProduct(p);
+            }
+        }
+    }
+
+    private boolean insertProduct(Product product){
+        String sql = "";
+        PreparedStatement stmt = null;
+
+        try {
+            sql = "INSERT INTO producto VALUES(?,?,?,?,?,?)";
+            stmt = conexionBD.prepareStatement(sql);
+            int i = 1;
+            stmt.setInt(i++, product.getID());
+            stmt.setString(i++, product.getName());
+            stmt.setFloat(i++, product.getPrice());
+            stmt.setInt(i++, product.getStock());
+            Date startDate = Date.valueOf(product.getCatalogStartDate());
+            stmt.setDate(i++, startDate);
+            Date endDate = Date.valueOf(product.getCatalogFinishDate());
+            stmt.setDate(i++, endDate);
+
             int rows = stmt.executeUpdate();
             if (rows == 1) return true;
             else return false;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+
         return false;
+
     }
 
     private boolean insertPack(Pack pack){
         String sql = "";
         PreparedStatement stmt = null;
-
+        System.out.println("Inserto pack");
         try {
             sql = "INSERT INTO pack VALUES(?,?,?,?,?,?,?)";
             stmt = conexionBD.prepareStatement(sql);
@@ -216,7 +223,7 @@ public class ProductsDAO {
 
             int rows = stmt.executeUpdate();
             if (rows == 1){
-                insertPackProductsList(pack.getID(),pack.getProductList());
+                return insertPackProductsList(pack.getID(),pack.getProductList());
             } else return false;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -228,20 +235,141 @@ public class ProductsDAO {
     private boolean insertPackProductsList(int id, TreeSet<Product> productsList){
         String sql = "";
         PreparedStatement stmt = null;
+        int counter = 0;
+
+        System.out.println("Inserto productList");
 
         for(Product product : productsList){
             try {
-                sql = "INSERT INTO productos_pack values(?, ?)";
-                stmt = conexionBD.prepareStatement(sql);
-                int i = 1;
-                stmt.setInt(i++, id);
-                stmt.setInt(i++, product.getID());
+
+                if(this.findInDB(product.getID())!=null){
+                    sql = "INSERT INTO productos_pack values(?, ?)";
+                    stmt = conexionBD.prepareStatement(sql);
+                    int i = 1;
+                    stmt.setInt(i++, id);
+                    stmt.setInt(i++, product.getID());
+    
+                    int rows = stmt.executeUpdate();
+                    if(rows==1){
+                        counter++;
+                    }
+                } else {
+                    System.out.println("No existe el producto: " + product.getID());
+                }
+
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
+
         }
+
+        return counter == productsList.size();
     }
 
+    private boolean updateProduct(Product product){
+        String sql = "";
+        PreparedStatement stmt = null;
+
+        try {
+            sql = "UPDATE producto set nombre=?, precio=?, stock=?, fecha_inicio=?, fecha_fin=? WHERE id = ?";
+            stmt = conexionBD.prepareStatement(sql);
+            int i = 1;
+            stmt.setString(i++, product.getName());
+            stmt.setFloat(i++, product.getPrice());
+            stmt.setInt(i++, product.getStock());
+            Date startDate = Date.valueOf(product.getCatalogStartDate());
+            stmt.setDate(i++, startDate);
+            Date endDate = Date.valueOf(product.getCatalogFinishDate());
+            stmt.setDate(i++, endDate);
+            stmt.setInt(i++, product.getId());
+
+            int rows = stmt.executeUpdate();
+            if (rows == 1) return true;
+            else return false;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+
+    private boolean updatePack(Pack pack){
+        String sql = "";
+        PreparedStatement stmt = null;
+
+        try {
+            sql = "UPDATE pack set nombre=?, precio=?, stock=?, fecha_inicio=?, fecha_fin=?, dto=? WHERE id = ?";
+            stmt = conexionBD.prepareStatement(sql);
+            int i = 1;
+            stmt.setString(i++, pack.getName());
+            stmt.setFloat(i++, pack.getPrice());
+            stmt.setInt(i++, pack.getStock());
+            Date startDate = Date.valueOf(pack.getCatalogStartDate());
+            stmt.setDate(i++, startDate);
+            Date endDate = Date.valueOf(pack.getCatalogFinishDate());
+            stmt.setDate(i++, endDate);
+            stmt.setInt(i++, pack.getDiscount());
+            stmt.setInt(i++, pack.getId());
+
+            int rows = stmt.executeUpdate();
+            if (rows == 1) {
+                if(deletePackProductList(pack.getID())){
+                    System.out.println("Elimino los productos del pack.");
+                    return updatePackProductList(pack.getId(), pack.getProductList());
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+
+    private boolean updatePackProductList(int id,TreeSet<Product> productsList){
+        String sql = "";
+        PreparedStatement stmt = null;
+        int counter = 0;
+
+        try {
+            for(Product product : productsList){
+                if(findInDB(product.getID())!=null){
+                    sql = "INSERT into productos_pack values(?,?)";
+                    stmt = conexionBD.prepareStatement(sql);
+                    int i = 1;
+                    stmt.setInt(i++, id);
+                    stmt.setInt(i++, product.getID());
+                    counter++;
+                    stmt.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return counter==productsList.size();
+    }
+
+    private boolean deletePackProductList(int id){
+        String sql = "";
+        PreparedStatement stmt = null;
+
+        try {
+            sql = "DELETE FROM productos_pack where id_pack=?";
+            stmt = conexionBD.prepareStatement(sql);
+            int i = 1;
+            stmt.setInt(i++, id);
+
+            int rows = stmt.executeUpdate();
+            if (rows >= 1) return true;
+            else return false;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        return false;
+    }
 
     //Funcion para borrar en la base de datos
     public boolean deleteInDB(Integer id){
