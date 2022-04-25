@@ -376,7 +376,21 @@ public class ProductsDAO {
         try {
             String sql = "";
             PreparedStatement stmt = null;
-            if(findInDB(id)!= null){
+            Object obj = findInDB(id);
+            if(obj!= null){
+                if(obj instanceof Pack){
+                    Pack p = (Pack)obj;
+                    if(deletePackProductList(p.getID())){
+                        sql = "DELETE FROM pack where id = ?";
+                        stmt = conexionBD.prepareStatement(sql);
+
+                        int i=1;
+                        stmt.setInt(i++, p.getID());
+                        int rows = stmt.executeUpdate();
+                        if (rows == 1) return true;
+                        else return false;
+                    } 
+                }
                 sql = "DELETE FROM producto WHERE id = ?";
                 stmt = conexionBD.prepareStatement(sql);
                 int i = 1;
