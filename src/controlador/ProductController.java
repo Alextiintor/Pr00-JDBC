@@ -271,11 +271,11 @@ public class ProductController {
                 packCheckBox.setSelected(true);
                 packGridPane.setVisible(true);
                 dtoTextField.setText(String.valueOf(packTemp.getDiscount()));
-                String packProductListString = productsDAO.getPackProductString(packTemp.getID());
+                String packProductListString = productsDAO.getPackProductString(packTemp.getId());
                 listTextArea.setText(packProductListString);
             } else {
                 Product productTemp = (Product)_product;
-                idTextField.setText(String.valueOf(productTemp.getID()));
+                idTextField.setText(String.valueOf(productTemp.getId()));
                 nameTextField.setText(productTemp.getName());
                 priceTextField.setText(String.valueOf(productTemp.getPrice()));
                 stockTextField.setText(String.valueOf(productTemp.getStock()));

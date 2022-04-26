@@ -3,7 +3,7 @@ package model;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Product implements Serializable, Identificable, Comparable<Product> {
+public class Product implements Serializable, Comparable<Product> {
     private static final long serialVersionUID = 12323151345l;
     private int idProduct;
     private String name;
@@ -103,11 +103,6 @@ public class Product implements Serializable, Identificable, Comparable<Product>
         }
 
         return true;
-    }
-
-    @Override
-    public int getID() {
-        return getId();
     }
 
     @Override

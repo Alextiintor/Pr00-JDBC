@@ -146,7 +146,7 @@ public class ProductsDAO {
         TreeSet<Product> packProductList = getPackProductList(id);
         String packProductsString = "";
         for(Product product : packProductList){
-            packProductsString += product.getID() + ",";
+            packProductsString += product.getId() + ",";
         }
         return packProductsString;
     }
@@ -156,7 +156,7 @@ public class ProductsDAO {
     public boolean saveInDB(Object obj){
         Product productTMP = (Product)obj;
 
-        if(findInDB(productTMP.getID()) == null){
+        if(findInDB(productTMP.getId()) == null){
             if(obj instanceof Pack){
                 Pack p = (Pack)obj;
                 return insertPack(p);
@@ -166,7 +166,7 @@ public class ProductsDAO {
             }
 
         } else {
-            if(isPack(productTMP.getID())){
+            if(isPack(productTMP.getId())){
                 Pack pack = (Pack)obj;
                 return updatePack(pack);
             } else {
@@ -184,7 +184,7 @@ public class ProductsDAO {
             sql = "INSERT INTO producto VALUES(?,?,?,?,?,?)";
             stmt = conexionBD.prepareStatement(sql);
             int i = 1;
-            stmt.setInt(i++, product.getID());
+            stmt.setInt(i++, product.getId());
             stmt.setString(i++, product.getName());
             stmt.setFloat(i++, product.getPrice());
             stmt.setInt(i++, product.getStock());
@@ -212,7 +212,7 @@ public class ProductsDAO {
             sql = "INSERT INTO pack VALUES(?,?,?,?,?,?,?)";
             stmt = conexionBD.prepareStatement(sql);
             int i = 1;
-            stmt.setInt(i++, pack.getID());
+            stmt.setInt(i++, pack.getId());
             stmt.setString(i++, pack.getName());
             stmt.setFloat(i++, pack.getPrice());
             stmt.setInt(i++, pack.getStock());
@@ -224,7 +224,7 @@ public class ProductsDAO {
 
             int rows = stmt.executeUpdate();
             if (rows == 1){
-                return insertPackProductsList(pack.getID(),pack.getProductList());
+                return insertPackProductsList(pack.getId(),pack.getProductList());
             } else return false;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -243,19 +243,19 @@ public class ProductsDAO {
         for(Product product : productsList){
             try {
 
-                if(this.findInDB(product.getID())!=null){
+                if(this.findInDB(product.getId())!=null){
                     sql = "INSERT INTO productos_pack values(?, ?)";
                     stmt = conexionBD.prepareStatement(sql);
                     int i = 1;
                     stmt.setInt(i++, id);
-                    stmt.setInt(i++, product.getID());
+                    stmt.setInt(i++, product.getId());
     
                     int rows = stmt.executeUpdate();
                     if(rows==1){
                         counter++;
                     }
                 } else {
-                    System.out.println("No existe el producto: " + product.getID());
+                    System.out.println("No existe el producto: " + product.getId());
                 }
 
             } catch (SQLException e) {
@@ -313,7 +313,7 @@ public class ProductsDAO {
 
             int rows = stmt.executeUpdate();
             if (rows == 1) {
-                if(deletePackProductList(pack.getID())){
+                if(deletePackProductList(pack.getId())){
                     System.out.println("Elimino los productos del pack.");
                     return updatePackProductList(pack.getId(), pack.getProductList());
                 } else {
@@ -335,12 +335,12 @@ public class ProductsDAO {
 
         try {
             for(Product product : productsList){
-                if(findInDB(product.getID())!=null){
+                if(findInDB(product.getId())!=null){
                     sql = "INSERT into productos_pack values(?,?)";
                     stmt = conexionBD.prepareStatement(sql);
                     int i = 1;
                     stmt.setInt(i++, id);
-                    stmt.setInt(i++, product.getID());
+                    stmt.setInt(i++, product.getId());
                     counter++;
                     stmt.executeUpdate();
                 }
@@ -381,12 +381,12 @@ public class ProductsDAO {
             if(obj!= null){
                 if(obj instanceof Pack){
                     Pack p = (Pack)obj;
-                    if(deletePackProductList(p.getID())){
+                    if(deletePackProductList(p.getId())){
                         sql = "DELETE FROM pack where id = ?";
                         stmt = conexionBD.prepareStatement(sql);
 
                         int i=1;
-                        stmt.setInt(i++, p.getID());
+                        stmt.setInt(i++, p.getId());
                         int rows = stmt.executeUpdate();
                         if (rows == 1) return true;
                         else return false;
