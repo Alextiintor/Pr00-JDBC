@@ -6,9 +6,10 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Struct;
+
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class PersonesDAO {
 
@@ -33,8 +34,33 @@ public class PersonesDAO {
 	private Persona createPersonFromDB(ResultSet result){
 		Persona p = null;
 		
-		try {
-			Direccion dir = new Direccion("Sabadell", "Barcelona", "08203", "Av. Barbera");
+		try (PreparedStatement stmt = conexionBD.prepareStatement("select direccion from persona where id = ?")){
+			stmt.setInt(1, result.getInt("id"));
+			ResultSet resultDir = stmt.executeQuery();
+			// resultDir.next();
+			String [] dirValues = result.getObject("direccion").toString().split(",");
+			for(String s : dirValues){
+				System.out.println(s);
+			}
+			
+			// Direccion dir = (Direccion)resultDir.getObject("direccion");
+			// System.out.println(dir);
+
+
+			// Struct direccion = (Struct)result.getObject("direccion");
+			char empty = '\0';
+			Direccion dir = new Direccion("", "", "", "");
+			dir.setLocalidad(dirValues[0].replace('(', empty));
+			dir.setProvincia(dirValues[1]);
+			dir.setCp(dirValues[2]);
+			dir.setCalle(dirValues[3].replace(')', empty));
+
+			// Direccion dir = new Direccion(
+			// 	resultDir.getString("localidad"), 
+			//  	resultDir.getString("provincia"), 
+			// 	resultDir.getString("cp"), 
+			// 	resultDir.getString("calle")
+			// );
 			p = new Persona(
 				result.getInt("id"), 
 				result.getString("dni"), 
@@ -45,6 +71,7 @@ public class PersonesDAO {
 				result.getArray("telefonos"), 
 				dir
 			);
+			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}

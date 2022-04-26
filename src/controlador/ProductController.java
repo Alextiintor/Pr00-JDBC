@@ -195,6 +195,7 @@ public class ProductController {
 			}
 			
 			clearForm();
+            defaultValidators();
 
 			productsTable.refresh();
 
