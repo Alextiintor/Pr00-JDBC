@@ -1,6 +1,7 @@
 package controlador;
 
 import java.io.IOException;
+import java.sql.Array;
 import java.sql.Connection;
 import java.util.Optional;
 
@@ -15,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -23,6 +25,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.Persona;
 import model.PersonesDAO;
@@ -41,11 +44,20 @@ public class PersonesController{
 	@FXML
 	private AnchorPane anchorPane;
 	private Stage ventana;
+
 	@FXML private TextField idTextField;
-	@FXML private TextField nomTextField;
-	@FXML private TextField cognomsTextField;
+	@FXML private TextField dniTextField;
+	@FXML private TextField nameTextField;
+	@FXML private TextField lastNameTextField;
+	@FXML private DatePicker birthDateDatePicker;
 	@FXML private TextField emailTextField;
-	@FXML private TextField telefonTextField;
+	@FXML private TextField phonesTextField;
+
+	@FXML private TextField localidadTextField;
+	@FXML private TextField provinciaTextField;
+	@FXML private TextField cpTextField;
+	@FXML private TextField calleTextField;
+
 	@FXML private TableView<Persona> personesTable;
 	@FXML private TableColumn<Persona, Integer> idColumn;
 	@FXML private TableColumn<Persona, String> nomColumn;
@@ -69,7 +81,7 @@ public class PersonesController{
 	 */
 	@FXML private void initialize() {
 		idColumn.setCellValueFactory(new PropertyValueFactory<Persona,Integer>("id"));
-		nomColumn.setCellValueFactory(new PropertyValueFactory<Persona,String>("nom"));
+		nomColumn.setCellValueFactory(new PropertyValueFactory<Persona,String>("name"));
 
 		// Quan l'usuari canvia de linia executem el métode mostrarPersona
 		personesTable.getSelectionModel().selectedItemProperty().addListener(
@@ -80,11 +92,12 @@ public class PersonesController{
 		//produeix error si no posem a les VM arguments això: --add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED
 		vs = new ValidationSupport();
 		vs.registerValidator(idTextField, true, Validator.createEmptyValidator("ID obligatori"));
-		vs.registerValidator(nomTextField, true, Validator.createEmptyValidator("Nom obligatori"));
-		vs.registerValidator(cognomsTextField, true, Validator.createEmptyValidator("Cognoms obligatori"));
-		//https://howtodoinjava.com/regex/java-regex-validate-email-address/
+		vs.registerValidator(dniTextField, true, Validator.createEmptyValidator("DNI obligatorio"));
+		vs.registerValidator(nameTextField, true, Validator.createEmptyValidator("Nom obligatori"));
+		vs.registerValidator(lastNameTextField, true, Validator.createEmptyValidator("Cognoms obligatori"));
+		vs.registerValidator(birthDateDatePicker, true, Validator.createEmptyValidator("Fecha de nacimiento obligatoria"));
+		// //https://howtodoinjava.com/regex/java-regex-validate-email-address/
 		vs.registerValidator(emailTextField, Validator.createRegexValidator("E-mail incorrecte", "^(.+)@(.+)$", Severity.ERROR));
-		vs.registerValidator(telefonTextField, Validator.createRegexValidator("Telèfon ha de ser un número", "\\d*", Severity.ERROR));
 	}
 
 	public Stage getVentana() {
@@ -118,7 +131,7 @@ public class PersonesController{
 					personesData.remove(personesTable.getSelectionModel().getSelectedIndex());
 
 					limpiarFormulario();
-					personesDAO.showAll();
+					//personesDAO.showAll();
 				}
 			}
 		}
@@ -134,30 +147,44 @@ public class PersonesController{
 		//verificar si les dades són vàlides
 		if(isDatosValidos()){
 			if(nouRegistre){
-				persona = new Persona(Integer.parseInt(idTextField.getText()), nomTextField.getText(), cognomsTextField.getText(),
-						emailTextField.getText(), telefonTextField.getText());
+				Array phoneArray = personesDAO.getPhoneArray(phonesTextField.getText());
+				persona = new Persona(
+					Integer.parseInt(idTextField.getText()), 
+					dniTextField.getText(),
+					nameTextField.getText(), 
+					lastNameTextField.getText(), 
+					birthDateDatePicker.getValue(),
+					emailTextField.getText(), 
+					phoneArray,
+					null
+				);
 
 				personesData.add(persona);
 			}else{
 				//modificació registre existent
 				persona = personesTable.getSelectionModel().getSelectedItem();
 
-				persona.setNom(nomTextField.getText()); 
-				persona.setApellidos(cognomsTextField.getText()); 
+				Array phoneArray = personesDAO.getPhoneArray(phonesTextField.getText());
+
+				persona.setDni(dniTextField.getText());
+				persona.setName(nameTextField.getText()); 
+				persona.setLastName(lastNameTextField.getText()); 
+				persona.setBirthDate(birthDateDatePicker.getValue());
 				persona.setEmail(emailTextField.getText()); 
-				persona.setTelefon(telefonTextField.getText()); 
+				persona.setPhones(phoneArray);
+				//persona.setTelefon(telefonTextField.getText()); 
 			}
 			personesDAO.save(persona);
 			limpiarFormulario();
 
 			personesTable.refresh();
 
-			personesDAO.showAll();
+			//personesDAO.showAll();
 		}
 	}
 
 	public void sortir(){
-		personesDAO.showAll();
+		//personesDAO.showAll();
 	}
 	private boolean isDatosValidos() {
 
@@ -178,30 +205,54 @@ public class PersonesController{
 	}
 
 	private void mostrarPersona(Persona persona) {
+
 		if(persona != null){ 
 			//llegir persona (posar els valors als controls per modificar-los)
 			nouRegistre = false;
 			idTextField.setText(String.valueOf(persona.getId()));
-			nomTextField.setText(persona.getNom());
-			cognomsTextField.setText(persona.getApellidos());
+			dniTextField.setText(persona.getDni());
+			nameTextField.setText(persona.getName());
+			lastNameTextField.setText(persona.getLastName());
+			birthDateDatePicker.setValue(persona.getBirthDate());
 			emailTextField.setText(persona.getEmail());
-			telefonTextField.setText(persona.getTelefon());
+			phonesTextField.setText(persona.getPhones().toString());
+
+			if(persona.getDir()!=null){
+				localidadTextField.setText(persona.getDir().getLocalidad());
+				provinciaTextField.setText(persona.getDir().getProvincia());
+				cpTextField.setText(persona.getDir().getCp());
+				calleTextField.setText(persona.getDir().getCalle());
+			}
 		}else{ 
 			//nou registre
 			nouRegistre = true;
 			//idTextField.setText(""); no hem de netejar la PK perquè l'usuari ha posat un valor
-			nomTextField.setText("");
-			cognomsTextField.setText("");
+			dniTextField.setText("");
+			nameTextField.setText("");
+			lastNameTextField.setText("");
+			birthDateDatePicker.setValue(null);
 			emailTextField.setText("");
-			telefonTextField.setText("");
+			phonesTextField.setText("");
 		}
 	}
 
+	// private String getPhoneString(Array phones){
+	// 	phones[i];
+	// 	phones.toString();
+	// }
+
 	private void limpiarFormulario(){
 		idTextField.setText("");
-		nomTextField.setText("");
-		cognomsTextField.setText("");
+		dniTextField.setText("");
+		nameTextField.setText("");
+		lastNameTextField.setText("");
+		birthDateDatePicker.setValue(null);
 		emailTextField.setText("");
-		telefonTextField.setText("");
+		phonesTextField.setText("");
+
+		localidadTextField.setText("");
+		provinciaTextField.setText("");
+		cpTextField.setText("");
+		calleTextField.setText("");
 	}
 }

@@ -30,7 +30,6 @@ public class IniciMenuController extends Application {
 			String usuari = "postgres";
 			String contrasenya = "alex";
 			conexionBD = DriverManager.getConnection(urlBaseDades , usuari, contrasenya);
-
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -74,6 +73,17 @@ public class IniciMenuController extends Application {
 
 	}
 
+	@FXML
+	void onActionMenuItemFichar(ActionEvent event) throws IOException{
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/ProductsView.fxml"));
+		Pane pane = (AnchorPane)loader.load();
+
+		ProductController productController = (ProductController)loader.getController();
+		productController.setDBConnection(conexionBD);
+
+		borderPane.setCenter(pane);
+
+	}
 
 	@FXML
 	void onActionMenuItemSortir(ActionEvent event) {

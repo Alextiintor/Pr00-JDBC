@@ -1,30 +1,40 @@
 package model;
 
 import java.io.Serializable;
+import java.sql.Array;
+import java.time.LocalDate;
 
 public class Persona implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private int id;
-	private String nom;
-	private String apellidos;
+	private String dni;
+	private String name;
+	private String lastName;
+	private LocalDate birthDate;
 	private String email;
-	private String telefon;
+	private Array phones;
+	private Direccion dir;
 
-	public Persona() {
-		this.id = 0;
-		this.nom = "";
-		this.apellidos = "";
-		this.email = "";
-		this.telefon = "";
-	}
+	// public Persona() {
+	// 	this.id = 0;
+	// 	this.name= "";
+	// 	this.lastName = "";
+	// 	this.email = "";
+	// 	this.phones = "";
+	// 	this.dir = null;
+	// }
 	
-	public Persona(int id, String nom, String apellidos, String email, String telefon) {
+	public Persona(int id, String dni, String name, String lastName, LocalDate birthDate, String email, Array phones,
+			Direccion dir) {
 		this.id = id;
-		this.nom = nom;
-		this.apellidos = apellidos;
+		this.dni = dni;
+		this.name = name;
+		this.lastName = lastName;
+		this.birthDate = birthDate;
 		this.email = email;
-		this.telefon = telefon;
+		this.phones = phones;
+		this.dir = dir;
 	}
 	
 	public int getId() {
@@ -35,20 +45,28 @@ public class Persona implements Serializable {
 		this.id = id;
 	}
 
-	public String getNom() {
-		return nom;
+	public String getDni() {
+		return dni;
 	}
 
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	
-	public String getApellidos() {
-		return apellidos;
+	public void setDni(String dni) {
+		this.dni = dni;
 	}
 
-	public void setApellidos(String apellidos) {
-		this.apellidos = apellidos;
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getEmail() {
@@ -59,19 +77,33 @@ public class Persona implements Serializable {
 		this.email = email;
 	}
 
-	public String getTelefon() {
-		return telefon;
+	public Array getPhones() {
+		return phones;
 	}
 
-	public void setTelefon(String telefon) {
-		this.telefon = telefon;
+	public void setPhones(Array phones) {
+		this.phones = phones;
 	}
-	
-	public void imprimir(){
-		System.out.println("Id: " + id);
-		System.out.println("Nom: " + nom);
-		System.out.println("Apellidos: " + apellidos);
-		System.out.println("E-mail: " + email);
-		System.out.println("Telèfon: " + telefon);
+
+	public Direccion getDir() {
+		return dir;
+	}
+
+	public void setDir(Direccion dir) {
+		this.dir = dir;
+	}
+
+	public LocalDate getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(LocalDate birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	@Override
+	public String toString() {
+		return "Persona [dir=" + dir + ", dni=" + dni + ", email=" + email + ", id=" + id + ", lastName=" + lastName
+				+ ", name=" + name + ", phones=" + phones + "]";
 	}
 }

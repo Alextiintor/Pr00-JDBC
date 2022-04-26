@@ -142,7 +142,7 @@ public class ProductController {
 		if(isDataValid()){
 			// Mostrar missatge confirmació
 			Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setHeaderText("Vol esborrar la persona " + idTextField.getText() + "?");
+			alert.setHeaderText("Quieres borrar el producto " + idTextField.getText() + "?");
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == ButtonType.OK) {
 				if(productsDAO.deleteInDB(Integer.parseInt(idTextField.getText()))){ 
@@ -256,7 +256,6 @@ public class ProductController {
 		return true;
 	}
 
-
     private void showProduct(Object _product){
         if(_product!=null){
             newProduct = false;
@@ -303,7 +302,6 @@ public class ProductController {
             listTextArea.setText("");
         }
     }
-
 
     private void clearForm(){
 		idTextField.setText("");

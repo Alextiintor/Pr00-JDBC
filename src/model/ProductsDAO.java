@@ -35,6 +35,7 @@ public class ProductsDAO {
         } catch(SQLException e){
             System.out.println(e.getMessage());
         }
+        System.out.println(productsList);
         return productsList;
     }
 
