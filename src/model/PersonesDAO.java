@@ -34,33 +34,19 @@ public class PersonesDAO {
 	private Persona createPersonFromDB(ResultSet result){
 		Persona p = null;
 		
-		try (PreparedStatement stmt = conexionBD.prepareStatement("select direccion from persona where id = ?")){
-			stmt.setInt(1, result.getInt("id"));
-			ResultSet resultDir = stmt.executeQuery();
-			// resultDir.next();
+		try {
+			// Obtener los resultados de la columna direccion en string, separarlo por comas y guardarlo en una array.
 			String [] dirValues = result.getObject("direccion").toString().split(",");
-			for(String s : dirValues){
-				System.out.println(s);
-			}
 			
-			// Direccion dir = (Direccion)resultDir.getObject("direccion");
-			// System.out.println(dir);
-
-
-			// Struct direccion = (Struct)result.getObject("direccion");
+			// Creo el caracter vacio
 			char empty = '\0';
 			Direccion dir = new Direccion("", "", "", "");
+			// Añado a la direccion los atributos correspondientes reemplazando los parentesis por el caracter vacio.
 			dir.setLocalidad(dirValues[0].replace('(', empty));
 			dir.setProvincia(dirValues[1]);
 			dir.setCp(dirValues[2]);
 			dir.setCalle(dirValues[3].replace(')', empty));
 
-			// Direccion dir = new Direccion(
-			// 	resultDir.getString("localidad"), 
-			//  	resultDir.getString("provincia"), 
-			// 	resultDir.getString("cp"), 
-			// 	resultDir.getString("calle")
-			// );
 			p = new Persona(
 				result.getInt("id"), 
 				result.getString("dni"), 
@@ -96,7 +82,7 @@ public class PersonesDAO {
 			String sql = "";
 			PreparedStatement stmt = null;
 			if (this.find(persona.getId()) == null){
-				sql = "INSERT INTO persona VALUES(?,?,?,?,?,?,?,?)";
+				sql = "INSERT INTO persona VALUES(?,?,?,?,?,?,?, row(?,?,?,?))";
 				stmt = conexionBD.prepareStatement(sql);
 				int i = 1;
 				stmt.setInt(i++, persona.getId());
@@ -106,9 +92,13 @@ public class PersonesDAO {
 				stmt.setDate(i++, Date.valueOf(persona.getBirthDate()));
 				stmt.setString(i++, persona.getEmail());
 				stmt.setArray(i++, persona.getPhones());
-				stmt.setObject(i++, persona.getDir());
+
+				stmt.setString(i++, persona.getDir().getLocalidad());
+				stmt.setString(i++, persona.getDir().getProvincia());
+				stmt.setString(i++, persona.getDir().getCp());
+				stmt.setString(i++, persona.getDir().getCalle());
 			} else{
-				sql = "UPDATE persona SET dni=?,name=?,lastname=?,fecha_nacimiento=?, email=?, telefonos=? WHERE id = ?";
+				sql = "UPDATE persona SET dni=?,name=?,lastname=?,fecha_nacimiento=?, email=?, telefonos=?, direccion= ROW(?,?,?,?) WHERE id = ?";
 				stmt = conexionBD.prepareStatement(sql);
 				int i = 1;
 				stmt.setString(i++, persona.getDni());
@@ -117,6 +107,14 @@ public class PersonesDAO {
 				stmt.setDate(i++, Date.valueOf(persona.getBirthDate()));
 				stmt.setString(i++, persona.getEmail());
 				stmt.setArray(i++, persona.getPhones());
+
+				System.out.println(persona.getDir());
+
+				stmt.setString(i++, persona.getDir().getLocalidad());
+				stmt.setString(i++, persona.getDir().getProvincia());
+				stmt.setString(i++, persona.getDir().getCp());
+				stmt.setString(i++, persona.getDir().getCalle());
+
 				stmt.setInt(i++, persona.getId());
 			}
 			int rows = stmt.executeUpdate();

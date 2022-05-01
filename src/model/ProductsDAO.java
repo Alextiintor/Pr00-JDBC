@@ -35,7 +35,6 @@ public class ProductsDAO {
         } catch(SQLException e){
             System.out.println(e.getMessage());
         }
-        System.out.println(productsList);
         return productsList;
     }
 
@@ -207,7 +206,6 @@ public class ProductsDAO {
     private boolean insertPack(Pack pack){
         String sql = "";
         PreparedStatement stmt = null;
-        System.out.println("Inserto pack");
         try {
             sql = "INSERT INTO pack VALUES(?,?,?,?,?,?,?)";
             stmt = conexionBD.prepareStatement(sql);
@@ -237,8 +235,6 @@ public class ProductsDAO {
         String sql = "";
         PreparedStatement stmt = null;
         int counter = 0;
-
-        System.out.println("Inserto productList");
 
         for(Product product : productsList){
             try {
@@ -314,7 +310,6 @@ public class ProductsDAO {
             int rows = stmt.executeUpdate();
             if (rows == 1) {
                 if(deletePackProductList(pack.getId())){
-                    System.out.println("Elimino los productos del pack.");
                     return updatePackProductList(pack.getId(), pack.getProductList());
                 } else {
                     return false;

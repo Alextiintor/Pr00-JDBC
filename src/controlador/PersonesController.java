@@ -27,6 +27,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import model.Direccion;
 import model.Persona;
 import model.PersonesDAO;
 
@@ -94,10 +95,15 @@ public class PersonesController{
 		vs.registerValidator(idTextField, true, Validator.createEmptyValidator("ID obligatori"));
 		vs.registerValidator(dniTextField, true, Validator.createEmptyValidator("DNI obligatorio"));
 		vs.registerValidator(nameTextField, true, Validator.createEmptyValidator("Nom obligatori"));
-		vs.registerValidator(lastNameTextField, true, Validator.createEmptyValidator("Cognoms obligatori"));
+		vs.registerValidator(lastNameTextField, true, Validator.createEmptyValidator("Cognoms obligatorio"));
 		vs.registerValidator(birthDateDatePicker, true, Validator.createEmptyValidator("Fecha de nacimiento obligatoria"));
-		// //https://howtodoinjava.com/regex/java-regex-validate-email-address/
-		vs.registerValidator(emailTextField, Validator.createRegexValidator("E-mail incorrecte", "^(.+)@(.+)$", Severity.ERROR));
+		vs.registerValidator(emailTextField, Validator.createRegexValidator("E-mail incorrecto", "^(.+)@(.+)$", Severity.ERROR));
+		vs.registerValidator(phonesTextField, true, Validator.createEmptyValidator("Telefono/s obligatorio"));
+
+		vs.registerValidator(localidadTextField, true, Validator.createEmptyValidator("Localidad obligatoria"));
+		vs.registerValidator(provinciaTextField, true, Validator.createEmptyValidator("Provincia obligatoria"));
+		vs.registerValidator(cpTextField, true, Validator.createEmptyValidator("Codigo Postal obligatorio"));
+		vs.registerValidator(calleTextField, true, Validator.createEmptyValidator("Calle obligatoria"));
 	}
 
 	public Stage getVentana() {
@@ -148,6 +154,14 @@ public class PersonesController{
 		if(isDatosValidos()){
 			if(nouRegistre){
 				Array phoneArray = personesDAO.getPhoneArray(phonesTextField.getText());
+
+				Direccion dir = new Direccion(
+					localidadTextField.getText(), 
+					provinciaTextField.getText(), 
+					cpTextField.getText(), 
+					calleTextField.getText()
+				);
+
 				persona = new Persona(
 					Integer.parseInt(idTextField.getText()), 
 					dniTextField.getText(),
@@ -156,7 +170,7 @@ public class PersonesController{
 					birthDateDatePicker.getValue(),
 					emailTextField.getText(), 
 					phoneArray,
-					null
+					dir
 				);
 
 				personesData.add(persona);
@@ -166,12 +180,21 @@ public class PersonesController{
 
 				Array phoneArray = personesDAO.getPhoneArray(phonesTextField.getText());
 
+				Direccion dir = new Direccion(
+					localidadTextField.getText(), 
+					provinciaTextField.getText(), 
+					cpTextField.getText(), 
+					calleTextField.getText()
+				);
+
 				persona.setDni(dniTextField.getText());
 				persona.setName(nameTextField.getText()); 
 				persona.setLastName(lastNameTextField.getText()); 
 				persona.setBirthDate(birthDateDatePicker.getValue());
 				persona.setEmail(emailTextField.getText()); 
 				persona.setPhones(phoneArray);
+				persona.setDir(dir);
+
 				//persona.setTelefon(telefonTextField.getText()); 
 			}
 			personesDAO.save(persona);
@@ -194,8 +217,8 @@ public class PersonesController{
 			// Mostrar finestra amb els errors
 			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.initOwner(ventana);
-			alert.setTitle("Camps incorrectes");
-			alert.setHeaderText("Corregeix els camps incorrectes");
+			alert.setTitle("Campos incorrectos.");
+			alert.setHeaderText("Corrige los campos incorrectos.");
 			alert.setContentText(errors);
 			alert.showAndWait();
 		
@@ -217,12 +240,11 @@ public class PersonesController{
 			emailTextField.setText(persona.getEmail());
 			phonesTextField.setText(persona.getPhones().toString());
 
-			if(persona.getDir()!=null){
-				localidadTextField.setText(persona.getDir().getLocalidad());
-				provinciaTextField.setText(persona.getDir().getProvincia());
-				cpTextField.setText(persona.getDir().getCp());
-				calleTextField.setText(persona.getDir().getCalle());
-			}
+			localidadTextField.setText(persona.getDir().getLocalidad());
+			provinciaTextField.setText(persona.getDir().getProvincia());
+			cpTextField.setText(persona.getDir().getCp());
+			calleTextField.setText(persona.getDir().getCalle());
+
 		}else{ 
 			//nou registre
 			nouRegistre = true;
@@ -233,6 +255,11 @@ public class PersonesController{
 			birthDateDatePicker.setValue(null);
 			emailTextField.setText("");
 			phonesTextField.setText("");
+
+			localidadTextField.setText("");
+			provinciaTextField.setText("");
+			cpTextField.setText("");
+			calleTextField.setText("");
 		}
 	}
 
