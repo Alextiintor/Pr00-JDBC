@@ -66,6 +66,7 @@ public class IniciMenuController extends Application {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/ProductsView.fxml"));
 		Pane pane = (AnchorPane)loader.load();
 
+		
 		ProductController productController = (ProductController)loader.getController();
 		productController.setDBConnection(conexionBD);
 
@@ -75,11 +76,11 @@ public class IniciMenuController extends Application {
 
 	@FXML
 	void onActionMenuItemFichar(ActionEvent event) throws IOException{
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/ProductsView.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/AsistenciaView.fxml"));
 		Pane pane = (AnchorPane)loader.load();
 
-		ProductController productController = (ProductController)loader.getController();
-		productController.setDBConnection(conexionBD);
+		AsistenciaController asistenciaController = (AsistenciaController)loader.getController();
+		asistenciaController.setConexionBD(conexionBD);
 
 		borderPane.setCenter(pane);
 
