@@ -2,18 +2,24 @@ package model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import javax.persistence.*;
 
+
+@Entity
 public class Product implements Serializable, Comparable<Product> {
     private static final long serialVersionUID = 12323151345l;
-    private int idProduct;
+    @Id
+    private int id;
     private String name;
     private float price;
     private Integer stock;
     private LocalDate catalogStartDate;
     private LocalDate catalogFinishDate;
-
+    
+    public Product(){};
+    
     public Product(int idProduct, String name, float price, int stock, LocalDate catalogStartDate, LocalDate catalogFinishDate) {
-        this.idProduct = idProduct;
+        this.id = idProduct;
         this.name = name;
         this.price = price;
         this.stock = stock;
@@ -22,11 +28,11 @@ public class Product implements Serializable, Comparable<Product> {
     }
     
     public int getId() {
-        return idProduct;
+        return id;
     }
 
     public void setId(int idProduct) {
-        this.idProduct = idProduct;
+        this.id = idProduct;
     }
 
     public String getName() {
@@ -71,7 +77,7 @@ public class Product implements Serializable, Comparable<Product> {
 
     @Override
     public String toString() {
-        return "Product [idProduct=" + idProduct + ", name=" + name + ", price=" + price + ", stock=" + stock + ", catalogFinishDate=" + catalogFinishDate + ", catalogStartDate=" + catalogStartDate +"]";
+        return "Product [idProduct=" + id + ", name=" + name + ", price=" + price + ", stock=" + stock + ", catalogFinishDate=" + catalogFinishDate + ", catalogStartDate=" + catalogStartDate +"]";
     }
 
     public void putStock(int stock){
@@ -107,9 +113,9 @@ public class Product implements Serializable, Comparable<Product> {
 
     @Override
     public int compareTo(Product o) {
-        if(this.idProduct > o.idProduct){
+        if(this.id > o.id){
             return 1;
-        } else if (this.idProduct < o.idProduct){
+        } else if (this.id < o.id){
             return -1;
         } else {
             return 0;

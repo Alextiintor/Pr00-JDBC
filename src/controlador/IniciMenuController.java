@@ -5,6 +5,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -18,7 +22,7 @@ import javafx.stage.Stage;
 
 public class IniciMenuController extends Application {
 	
-	private Connection conexionBD;
+	private EntityManager em = null;
 
 	@FXML
     private BorderPane borderPane;
@@ -26,10 +30,8 @@ public class IniciMenuController extends Application {
 	public IniciMenuController() {
 		try{
 			//Establir la connexio amb la BD
-			String urlBaseDades = "jdbc:postgresql://localhost/tienda";
-			String usuari = "postgres";
-			String contrasenya = "alex";
-			conexionBD = DriverManager.getConnection(urlBaseDades , usuari, contrasenya);
+			EntityManagerFactory emf = Persistence.createEntityManagerFactory("Pr00-JDBC");
+			em = emf.createEntityManager();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}

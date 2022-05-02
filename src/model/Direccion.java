@@ -1,18 +1,18 @@
 package model;
 
-import java.sql.SQLData;
-import java.sql.SQLException;
-import java.sql.SQLInput;
-import java.sql.SQLOutput;
 
-public class Direccion implements SQLData {
+import javax.persistence.Embeddable;
+
+@Embeddable
+public class Direccion {
     private String localidad;
     private String provincia;
     private String cp;
     private String calle;
-    private String sql_type;
 
 
+    public Direccion() {}
+    
     public Direccion(String localidad, String provincia, String cp, String calle) {
         this.localidad = localidad;
         this.provincia = provincia;
@@ -65,31 +65,5 @@ public class Direccion implements SQLData {
     public String toString() {
         return "Direction [calle=" + calle + ", cp=" + cp + ", localidad=" + localidad + ", provincia=" + provincia
                 + "]";
-    }
-
-
-    @Override
-    public String getSQLTypeName() throws SQLException {
-        return sql_type;
-    }
-
-
-    @Override
-    public void readSQL(SQLInput stream, String typeName) throws SQLException {
-        sql_type = typeName;
-        localidad = stream.readString();
-        provincia = stream.readString();
-        cp = stream.readString();
-        calle = stream.readString();
-    }
-
-
-    @Override
-    public void writeSQL(SQLOutput stream) throws SQLException {
-        stream.writeString(localidad);
-        stream.writeString(provincia);
-        stream.writeString(cp);
-        stream.writeString(calle);
-    }
-   
+    }  
 }

@@ -10,19 +10,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
 public class ProductsDAO {
 
-    private Connection conexionBD;
+    private EntityManager em;
 
-    public ProductsDAO(Connection conexionBD) {
-        this.conexionBD = conexionBD;
+    public ProductsDAO(EntityManager em) {
+        this.em = em;
     }
 
     public List<Product> getProductsList(){
         List<Product> productsList = new ArrayList<Product>();
-        try(ResultSet result = conexionBD.createStatement().executeQuery("SELECT * from producto")){
-            while(result.next()){               
-                int productID = result.getInt("id");
+        
+        Query q = em.createNativeQuery("Select * from products", Product.class);
+        @SuppressWarnings("unchecked")
+		List<Product> results = q.getResultList();
+        for(Product p : results){
+        	while(p!=null) {
+        		int productID = p.getId();
                 //Ver si el producto es un pack
                 if(isPack(productID)){
                     Pack packTemp = createPackFromDB(productID);
@@ -31,9 +38,8 @@ public class ProductsDAO {
                     Product productTemp = createProductFromDB(productID);
                     productsList.add(productTemp);
                 }
-            }
-        } catch(SQLException e){
-            System.out.println(e.getMessage());
+        	}
+
         }
         return productsList;
     }
@@ -44,30 +50,25 @@ public class ProductsDAO {
         if(id == null || id == 0){
             return null;
         }
-
-        //Comprobar que el producto existe
-        try (PreparedStatement stmt = conexionBD.prepareStatement("SELECT * FROM producto WHERE id = ?")) {
-            stmt.setInt(1, id);
-            ResultSet result = stmt.executeQuery();
-            if(result.next()){
-                int productID = result.getInt("id");
-                //Ver si el producto es un pack
-                if(isPack(productID)){
-                    Pack tempPack = createPackFromDB(productID);
-                    return tempPack;
-                } else {
-                    Product p = createProductFromDB(productID);
-                    return p;
-                }
+    	Product p = em.find(Product.class, id);
+    	if(p!=null){
+            int productID = p.getId();
+            //Ver si el producto es un pack
+            if(isPack(productID)){
+                Pack tempPack = createPackFromDB(productID);
+                return tempPack;
+            } else {
+                Product tempProduct = createProductFromDB(productID);
+                return tempProduct;
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
         }
+
         return null;
     }
 
     //Funcion que comprueba si es un pack
     private boolean isPack(int id){
+    	
         try (PreparedStatement stmtPack = conexionBD.prepareStatement("SELECT * from pack where id = ?")){
             stmtPack.setInt(1, id);
             ResultSet resultPack = stmtPack.executeQuery();

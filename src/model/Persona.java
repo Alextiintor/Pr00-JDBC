@@ -1,31 +1,32 @@
 package model;
 
 import java.io.Serializable;
-import java.sql.Array;
-import java.time.LocalDate;
+import java.sql.Date;
+import java.util.Set;
+import javax.persistence.*;
 
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class Persona implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	@Id
 	private int id;
 	private String dni;
 	private String name;
 	private String lastName;
-	private LocalDate birthDate;
+	private Date birthDate;
 	private String email;
-	private Array phones;
+	@ElementCollection
+		@CollectionTable(name="persona_telefons",
+		joinColumns=@JoinColumn(name="idpersona"))
+		@Column(name="telefon")
+	private Set<String> phones;
+	@Embedded
 	private Direccion dir;
 
-	// public Persona() {
-	// 	this.id = 0;
-	// 	this.name= "";
-	// 	this.lastName = "";
-	// 	this.email = "";
-	// 	this.phones = "";
-	// 	this.dir = null;
-	// }
-	
-	public Persona(int id, String dni, String name, String lastName, LocalDate birthDate, String email, Array phones,
+	public Persona() {}	
+	public Persona(int id, String dni, String name, String lastName, Date birthDate, String email, Set<String> phones,
 			Direccion dir) {
 		this.id = id;
 		this.dni = dni;
@@ -77,11 +78,11 @@ public class Persona implements Serializable {
 		this.email = email;
 	}
 
-	public Array getPhones() {
+	public Set<String> getPhones() {
 		return phones;
 	}
 
-	public void setPhones(Array phones) {
+	public void setPhones(Set<String> phones) {
 		this.phones = phones;
 	}
 
@@ -93,11 +94,11 @@ public class Persona implements Serializable {
 		this.dir = dir;
 	}
 
-	public LocalDate getBirthDate() {
+	public Date getBirthDate() {
 		return birthDate;
 	}
 
-	public void setBirthDate(LocalDate birthDate) {
+	public void setBirthDate(Date birthDate) {
 		this.birthDate = birthDate;
 	}
 
